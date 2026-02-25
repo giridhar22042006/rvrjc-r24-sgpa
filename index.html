@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RVRJC R24 SGPA & CGPA Calculator Portal</title>
+  <meta name="description"
+    content="Official R24 SGPA &amp; CGPA Calculator for R.V.R &amp; J.C College of Engineering, Guntur. Supports all branches and semesters under CBCS credit system." />
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/rvrjc-logo.jpg" type="image/jpeg" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- html2pdf for PDF download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- ─── Sidebar Navigation ─── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <img src="assets/rvrjc-logo.jpg" alt="RVRJC Logo" id="mainLogo" />
+        </div>
+        <div class="logo-text">
+          <h1>RVRJC</h1>
+          <span>R24 Calculator</span>
+        </div>
+      </div>
+      <button class="sidebar-toggle" id="sidebarClose" aria-label="Close sidebar">✕</button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="calculator">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Calculator</span>
+      </a>
+      <a href="#" class="nav-item" data-section="history">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Semester History</span>
+      </a>
+      <a href="#" class="nav-item" data-section="progress">
+        <span class="nav-icon">📈</span>
+        <span class="nav-label">Progress Chart</span>
+      </a>
+      <a href="#" class="nav-item" data-section="ai-tools">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">AI Tools</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-icon" id="themeIcon">🌙</span>
+        <span class="nav-label">Dark Mode</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ─── Overlay for mobile sidebar ─── -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ─── Main Content ─── -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <button class="hamburger" id="hamburger" aria-label="Open sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="top-bar-title">
+        <h2>R.V.R &amp; J.C College of Engineering <small>(Autonomous), Guntur</small></h2>
+      </div>
+      <div class="top-bar-actions">
+        <button class="btn btn-outline btn-sm" id="printBtn" title="Print Result">🖨️ Print</button>
+        <button class="btn btn-primary btn-sm" id="downloadPdfBtn" title="Download PDF">📥 PDF</button>
+      </div>
+    </header>
+
+    <!-- ═══════════ SECTION: Calculator ═══════════ -->
+    <section class="content-section active" id="section-calculator">
+      <!-- Student Info Card -->
+      <div class="card glass student-info-card animate-in">
+        <h3 class="card-title">👤 Student Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="studentName">Student Name</label>
+            <input type="text" id="studentName" placeholder="Enter your name" autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label for="rollNumber">Roll Number</label>
+            <input type="text" id="rollNumber" placeholder="e.g. 24B01A0501" />
+          </div>
+          <div class="form-group">
+            <label for="branchSelect">Branch</label>
+            <select id="branchSelect">
+              <option value="">— Select Branch —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="yearSelect">Academic Year</label>
+            <select id="yearSelect">
+              <option value="">— Select Year —</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="semesterSelect">Semester</label>
+            <select id="semesterSelect">
+              <option value="">— Select Semester —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="regulationSelect">Regulation</label>
+            <select id="regulationSelect">
+              <option value="R24" selected>R24</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subject Table Card -->
+      <div class="card glass subject-table-card animate-in" id="subjectTableCard" style="display:none;">
+        <div class="card-header-row">
+          <h3 class="card-title">📝 Subjects &amp; Grades</h3>
+          <div class="card-actions">
+            <button class="btn btn-ghost btn-sm" id="resetSemBtn">🔄 Reset</button>
+            <button class="btn btn-accent btn-sm" id="saveSemBtn">💾 Save Semester</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="subject-table" id="subjectTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Type</th>
+                <th>Credits</th>
+                <th>Grade</th>
+                <th>GP</th>
+                <th>C × GP</th>
+              </tr>
+            </thead>
+            <tbody id="subjectTableBody">
+              <!-- Dynamically filled -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Validation message -->
+        <div class="validation-msg" id="validationMsg"></div>
+      </div>
+
+      <!-- Results Dashboard -->
+      <div class="results-dashboard animate-in" id="resultsDashboard" style="display:none;">
+        <div class="dashboard-grid">
+          <div class="stat-card glass" data-stat="total-credits">
+            <div class="stat-label">Total Credits</div>
+            <div class="stat-value" id="totalCredits">0</div>
+          </div>
+          <div class="stat-card glass" data-stat="earned-credits">
+            <div class="stat-label">Earned Credits</div>
+            <div class="stat-value" id="earnedCredits">0</div>
+          </div>
+          <div class="stat-card glass" data-stat="sgpa">
+            <div class="stat-label">SGPA</div>
+            <div class="stat-value accent" id="sgpaValue">0.00</div>
+          </div>
+          <div class="stat-card glass" data-stat="cgpa">
+            <div class="stat-label">CGPA</div>
+            <div class="stat-value" id="cgpaValue">0.00</div>
+          </div>
+          <div class="stat-card glass" data-stat="percentage">
+            <div class="stat-label">Percentage</div>
+            <div class="stat-value" id="percentageValue">0.00%</div>
+          </div>
+          <div class="stat-card glass" data-stat="class">
+            <div class="stat-label">Class</div>
+            <div class="stat-value" id="classValue">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SECTION: Semester History ═══════════ -->
+    <section class="content-section" id="section-history">
+      <div class="card glass animate-in">
+        <h3 class="card-title">📋 Saved Semester History</h3>
+        <p class="card-subtitle">Your saved semesters are stored locally in this browser.</p>
+        <div id="historyContainer" class="history-container">
+          <p class="empty-state">No semesters saved yet. Calculate &amp; save a semester to see it here.</p>
+        </div>
+        <div class="card-actions" style="margin-top:1rem;">
+          <button class="btn btn-danger btn-sm" id="clearHistoryBtn">🗑️ Clear All History</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SECTION: Progress Chart ═══════════ -->
+    <section class="content-section" id="section-progress">
+      <div class="card glass animate-in">
+        <h3 class="card-title">📈 CGPA Progress Chart</h3>
+        <p class="card-subtitle">Visualize your academic journey across semesters.</p>
+        <div class="chart-container">
+          <canvas id="cgpaChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SECTION: AI Tools ═══════════ -->
+    <section class="content-section" id="section-ai-tools">
+      <!-- GPA Prediction -->
+      <div class="card glass animate-in">
+        <h3 class="card-title">🔮 GPA Prediction Tool</h3>
+        <p class="card-subtitle">Predict your CGPA at the end of the programme based on current performance.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="currentCgpaInput">Current CGPA</label>
+            <input type="number" id="currentCgpaInput" step="0.01" min="0" max="10" placeholder="e.g. 8.50" />
+          </div>
+          <div class="form-group">
+            <label for="completedSems">Semesters Completed</label>
+            <input type="number" id="completedSems" min="1" max="7" placeholder="e.g. 4" />
+          </div>
+          <div class="form-group">
+            <label for="targetCgpa">Target CGPA</label>
+            <input type="number" id="targetCgpa" step="0.01" min="0" max="10" placeholder="e.g. 9.00" />
+          </div>
+        </div>
+        <button class="btn btn-primary" id="predictBtn" style="margin-top:1rem;">🚀 Predict</button>
+        <div class="ai-result-box" id="predictionResult"></div>
+      </div>
+
+      <!-- Required SGPA Calculator -->
+      <div class="card glass animate-in" style="margin-top:1.5rem;">
+        <h3 class="card-title">🎯 Required SGPA Calculator</h3>
+        <p class="card-subtitle">Find out what SGPA you need in remaining semesters to achieve your target CGPA.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="reqCurrentCgpa">Current CGPA</label>
+            <input type="number" id="reqCurrentCgpa" step="0.01" min="0" max="10" placeholder="e.g. 7.80" />
+          </div>
+          <div class="form-group">
+            <label for="reqCompletedSems">Semesters Completed</label>
+            <input type="number" id="reqCompletedSems" min="1" max="7" placeholder="e.g. 3" />
+          </div>
+          <div class="form-group">
+            <label for="reqTargetCgpa">Target CGPA</label>
+            <input type="number" id="reqTargetCgpa" step="0.01" min="0" max="10" placeholder="e.g. 8.50" />
+          </div>
+        </div>
+        <button class="btn btn-primary" id="reqSgpaBtn" style="margin-top:1rem;">📐 Calculate</button>
+        <div class="ai-result-box" id="reqSgpaResult"></div>
+      </div>
+
+      <!-- Backlog Simulation -->
+      <div class="card glass animate-in" style="margin-top:1.5rem;">
+        <h3 class="card-title">⚠️ Backlog Impact Simulation</h3>
+        <p class="card-subtitle">See how backlogs (F grades) affect your CGPA and what happens when you clear them.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="simCurrentCgpa">Current CGPA</label>
+            <input type="number" id="simCurrentCgpa" step="0.01" min="0" max="10" placeholder="e.g. 7.00" />
+          </div>
+          <div class="form-group">
+            <label for="simTotalCredits">Total Credits Earned</label>
+            <input type="number" id="simTotalCredits" min="1" placeholder="e.g. 80" />
+          </div>
+          <div class="form-group">
+            <label for="simBacklogCredits">Backlog Subject Credits</label>
+            <input type="number" id="simBacklogCredits" min="1" placeholder="e.g. 3" />
+          </div>
+          <div class="form-group">
+            <label for="simClearGrade">Grade If Cleared</label>
+            <select id="simClearGrade">
+              <option value="10">A+ (10)</option>
+              <option value="9">A (9)</option>
+              <option value="8" selected>B (8)</option>
+              <option value="7">C (7)</option>
+              <option value="6">D (6)</option>
+              <option value="5">E (5)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="simBacklogBtn" style="margin-top:1rem;">🧪 Simulate</button>
+        <div class="ai-result-box" id="simBacklogResult"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+      <p>© 2024-25 R.V.R &amp; J.C College of Engineering (Autonomous), Guntur &nbsp;|&nbsp; R24 Regulation
+        &nbsp;|&nbsp; Built for students, by students</p>
+    </footer>
+  </main>
+
+  <!-- ─── Report Template (hidden, used for PDF) ─── -->
+  <div id="pdfReport" class="pdf-report" style="display:none;">
+    <div class="pdf-header">
+      <h1>R.V.R & J.C College of Engineering (Autonomous), Guntur</h1>
+      <h2>R24 SGPA / CGPA Report</h2>
+    </div>
+    <div id="pdfBody"></div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
